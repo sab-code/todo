@@ -1,0 +1,282 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Todo Testing",
+		"_postman_id": "e89c87e2-ed45-dfa8-0168-626b494fb59b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/todo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"todoItemCount\", jsonData.length);",
+							"var firstTodo = jsonData[0];",
+							"postman.setGlobalVariable(\"todo\", JSON.stringify(firstTodo));",
+							"",
+							"// Make sure we get one that can be re-run without side-effect risk from other tests",
+							"var secondTodo = jsonData[1];",
+							"tests[\"Second Todo Title\"] = secondTodo.title === \"Test Two\";",
+							"tests[\"Second Todo Description\"] = secondTodo.description === \"Test Todo Two\";",
+							"tests[\"Second Todo Due\"] = secondTodo.due === \"08/04/3917 22:15:00\";"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:8080/todo",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/todo/1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var todo = postman.getGlobalVariable(\"todo\");",
+							"if (todo !== undefined)  {",
+							"    todo = JSON.parse(todo);",
+							"}",
+							"var output = JSON.parse(responseBody);",
+							"tests[\"Correct Title\"] = todo.title === output.title;",
+							"tests[\"Correct Id\"] = todo.id === output.id && output.id === 1;",
+							"tests[\"Correct Description\"] = todo.description === output.description;",
+							"tests[\"Correct Due Date\"] = todo.due === output.due;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:8080/todo/1",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/todo/1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"// Per requirements: This has no output.",
+							"",
+							"// var output = JSON.parse(responseBody);",
+							"",
+							"// tests[\"Todo Title Is Correct\"] = output.title === \"Test One Updated\";",
+							"// tests[\"Todo Description Is Correct\"] = output.description === \"Test Todo One Updated\";",
+							"// tests[\"Todo Due Date Is Correct\"] = output.due === \"07/03/2017 08:49:00\";"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:8080/todo/1",
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Test One Updated\",\n  \"description\": \"Test Todo One Updated\",\n  \"due\": \"07/03/2017 08:49:00\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/todo/new",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 201\"] = responseCode.code === 201;",
+							"",
+							"var output = JSON.parse(responseBody);",
+							"",
+							"postman.setGlobalVariable(\"newTodo\", responseBody);",
+							"postman.setGlobalVariable(\"newId\", output.id);",
+							"",
+							"tests[\"Todo Title Is Correct\"] = output.title === \"Test New Todo\";",
+							"tests[\"Todo Description Is Correct\"] = output.description === \"Test Todo New Todo via POST\";",
+							"tests[\"Todo Due Date Is Correct\"] = output.due === \"05/15/2017 12:00:00\";"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:8080/todo/new",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Test New Todo\",\n  \"description\": \"Test Todo New Todo via POST\",\n  \"due\": \"05/15/2017 12:00:00\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/todo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var oldItemCount = postman.getGlobalVariable(\"todoItemCount\");",
+							"oldItemCount++;",
+							"",
+							"tests[\"New Item Detected\"] = oldItemCount === jsonData.length;",
+							"",
+							"var newestTodo = jsonData[jsonData.length - 1];",
+							"",
+							"var todo = postman.getGlobalVariable(\"newTodo\");",
+							"if (todo !== undefined)  {",
+							"    todo = JSON.parse(todo);",
+							"}",
+							"",
+							"tests[\"Newest Todo Id\"] = newestTodo.id === todo.id;",
+							"tests[\"Newest Todo Title\"] = newestTodo.title === todo.title;",
+							"tests[\"Newest Todo Description\"] = newestTodo.description === todo.description;",
+							"tests[\"Newest Todo Due Date\"] = newestTodo.due === todo.due;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:8080/todo",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/todo/{{newId}}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var todo = postman.getGlobalVariable(\"newTodo\");",
+							"if (todo !== undefined)  {",
+							"    todo = JSON.parse(todo);",
+							"}",
+							"var output = JSON.parse(responseBody);",
+							"tests[\"Correct Title\"] = todo.title === output.title;",
+							"tests[\"Correct Id\"] = todo.id === output.id;",
+							"tests[\"Correct Description\"] = todo.description === output.description;",
+							"tests[\"Correct Due Date\"] = todo.due === output.due;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:8080/todo/{{newId}}",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/todo/1001 (not found)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 404\"] = responseCode.code === 404;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:8080/todo/1001",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/todo/1002 (not found)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 404\"] = responseCode.code === 404;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:8080/todo/1002",
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Test One Updated\",\n  \"description\": \"Test Todo One Updated\",\n  \"due\": \"07/03/2017 08:49:00\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

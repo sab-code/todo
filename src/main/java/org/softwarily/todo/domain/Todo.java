@@ -15,6 +15,8 @@ import javax.persistence.Transient;
 
 import org.softwarily.todo.TodoGenericException;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Todo domain object.
  * 
@@ -106,6 +108,7 @@ public class Todo {
 		return dueDateFormat.format(due);
 	}
 
+	@JsonIgnore
 	public Date getRawDueDate() {
 		return due;
 	}
@@ -117,7 +120,7 @@ public class Todo {
 	 *            the new value of the due date of the todo item.
 	 */
 	public void setDue(final String due) {
-		if (due != null) {
+		if (due != null && !due.trim().equals("")) {
 			try {
 				Date newDueDate = dueDateFormat.parse(due);
 				this.due = newDueDate;
