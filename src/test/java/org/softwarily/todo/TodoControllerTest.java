@@ -57,7 +57,7 @@ public class TodoControllerTest {
 	}
 
 	@Test
-	public void testFindOneTOdo() throws Exception {
+	public void testFindOneTodo() throws Exception {
 		List<Todo> list = controller.listTodos();
 		
 		Todo output = controller.getOneTodo(list.get(0).getId());

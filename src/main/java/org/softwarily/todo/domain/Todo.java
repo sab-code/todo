@@ -3,6 +3,7 @@
  */
 package org.softwarily.todo.domain;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,6 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
+
+import org.softwarily.todo.TodoGenericException;
 
 /**
  * Todo domain object.
@@ -28,6 +32,10 @@ public class Todo {
 	private String description;
 	/* Date and time that the todo item is due. */
 	private Date due;
+	
+	@Transient
+	private SimpleDateFormat dueDateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
 
 	/**
 	 * Default constructor not allowing for empty values in item.
@@ -95,17 +103,31 @@ public class Todo {
 	 * @return the current value of the due date of the todo item.
 	 */
 	public String getDue() {
-		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		return sdf.format(due);
+		return dueDateFormat.format(due);
 	}
 
+	public Date getRawDueDate() {
+		return due;
+	}
+	
 	/**
 	 * Modifier of the due date of the todo item.
 	 * 
 	 * @param due
 	 *            the new value of the due date of the todo item.
 	 */
-	public void setDue(final Date due) {
+	public void setDue(final String due) {
+		if (due != null) {
+			try {
+				Date newDueDate = dueDateFormat.parse(due);
+				this.due = newDueDate;
+			} catch (final ParseException e) {
+				throw new TodoGenericException("Could not parse date format.");
+			}
+		}
+	}
+	
+	public void setRawDueDate(final Date due) {
 		this.due = due;
 	}
 
